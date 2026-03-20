@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,24 @@ app.get('/', (req, res) => {
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
+});
+
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const result = await db.query('SELECT NOW()');
+    res.json({
+      ok: true,
+      timestamp: result.rows[0].now,
+      message: 'Conexión a PostgreSQL exitosa!'
+    });
+  } catch (error) {
+    console.error('Error probando la BD:', error);
+    res.status(500).json({ 
+      ok: false, 
+      error: 'No se pudo conectar a la base de datos',
+      details: error.message 
+    });
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
