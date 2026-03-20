@@ -3,10 +3,10 @@ const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   // Dependiendo de tu URL en Railway, a veces es necesario el SSL. 
-  // Configuramos rejectUnauthorized en false para evitar errores de certificados autofirmados.
-  ssl: {
-    rejectUnauthorized: false
-  }
+  // Solo aplicamos SSL si no estamos en localhost (o si forzamos vía NODE_ENV)
+  ...(process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost') && {
+    ssl: { rejectUnauthorized: false }
+  })
 });
 
 pool.on('error', (err) => {
