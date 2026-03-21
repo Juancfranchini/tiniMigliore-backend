@@ -10,12 +10,37 @@ const settingsRouter = require('./routes/settings');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const allowedOrigins = process.env.FRONTEND_URLS 
-  ? process.env.FRONTEND_URLS.split(',').map(url => url.trim())
-  : ['http://localhost:5173', 'https://tini-migliore1-12tfx0u9a-juan-cruz-franchinis-projects.vercel.app'];
+const allowedSpecificOrigins = [
+  'http://localhost:5173',
+  'https://tini-migliore1.vercel.app'
+];
 
 app.use(cors({
-  origin: allowedOrigins
+  origin: function (origin, callback) {
+    // Permitir solicitudes sin origin (como Postman o curl)
+    if (!origin) return callback(null, true);
+
+    // Permitir orígenes permitidos explícitamente
+    if (allowedSpecificOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Permitir dinámicamente cualquier subdominio de Vercel (deploy previews)
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+
+    // Mantener compatibilidad con otras URLs mediante variables de entorno
+    if (process.env.FRONTEND_URLS) {
+      const extraOrigins = process.env.FRONTEND_URLS.split(',').map(url => url.trim());
+      if (extraOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+    }
+
+    // Rechazar cualquier otro origen
+    return callback(new Error('Bloqueado por reglas de CORS'), false);
+  }
 }));
 
 app.use(express.json());
