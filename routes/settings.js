@@ -59,6 +59,20 @@ function unflatten(data) {
   return result;
 }
 
+// Helper: Convierte un objeto anidado a un objeto plano con sintaxis de punto
+function flatten(obj, prefix = '') {
+  let result = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+      const nested = flatten(obj[key], prefix + key + '.');
+      result = { ...result, ...nested };
+    } else {
+      result[prefix + key] = obj[key];
+    }
+  }
+  return result;
+}
+
 // GET /api/settings
 // Obtiene todas las configuraciones y las devuelve como un objeto JSON anidado
 router.get('/', async (req, res) => {
@@ -106,6 +120,38 @@ router.get('/:key', async (req, res) => {
   } catch (error) {
     console.error(`Error obteniendo el setting ${key}:`, error);
     res.status(500).json({ error: 'Error interno al obtener el setting' });
+  }
+});
+
+// PUT /api/settings
+// Actualiza o crea múltiples configuraciones recibiendo un objeto JSON anidado
+router.put('/', async (req, res) => {
+  try {
+    const nestedData = req.body;
+    
+    if (!nestedData || typeof nestedData !== 'object') {
+      return res.status(400).json({ error: 'Debes enviar un objeto JSON en el body' });
+    }
+
+    const flatData = flatten(nestedData);
+    const updatedKeys = [];
+
+    // Iteramos y aplicamos un UPSERT en cada clave
+    for (const [key, value] of Object.entries(flatData)) {
+      const stringValue = JSON.stringify(value);
+      await db.query(`
+        INSERT INTO settings (key, value, updated_at) 
+        VALUES ($1, $2, CURRENT_TIMESTAMP) 
+        ON CONFLICT (key) 
+        DO UPDATE SET value = $2, updated_at = CURRENT_TIMESTAMP
+      `, [key, stringValue]);
+      updatedKeys.push(key);
+    }
+    
+    res.json({ success: true, message: 'Configuraciones actualizadas en bloque', keys: updatedKeys });
+  } catch (error) {
+    console.error('Error actualizando configuraciones en bloque:', error);
+    res.status(500).json({ error: 'Error interno al actualizar configuraciones' });
   }
 });
 

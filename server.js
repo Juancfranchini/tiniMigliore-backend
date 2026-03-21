@@ -10,8 +10,12 @@ const settingsRouter = require('./routes/settings');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = process.env.FRONTEND_URLS 
+  ? process.env.FRONTEND_URLS.split(',').map(url => url.trim())
+  : ['http://localhost:5173', 'https://tini-migliore1.vercel.app'];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173'
+  origin: allowedOrigins
 }));
 
 app.use(express.json());
