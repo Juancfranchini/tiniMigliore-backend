@@ -127,23 +127,22 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Desactivación lógica
+    // Eliminación física
     const query = `
-      UPDATE products 
-      SET is_active = false, updated_at = CURRENT_TIMESTAMP 
+      DELETE FROM products 
       WHERE id = $1 
       RETURNING *;
     `;
     const result = await db.query(query, [id]);
     
     if (result.rows.length === 0) {
-      return sendResponse(res, false, 'Producto no encontrado para desactivar', 404);
+      return sendResponse(res, false, 'Producto no encontrado para eliminar', 404);
     }
     
-    sendResponse(res, true, { message: 'Producto desactivado correctamente', product: result.rows[0] });
+    sendResponse(res, true, { message: 'Producto eliminado correctamente', product: result.rows[0] });
   } catch (err) {
     console.error('Error DELETE /api/products/:id:', err);
-    sendResponse(res, false, 'Error al desactivar el producto', 500);
+    sendResponse(res, false, 'Error al eliminar el producto', 500);
   }
 });
 
