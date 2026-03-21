@@ -127,28 +127,36 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Eliminar (Desactivación lógica)
+// Eliminar (Hard Delete)
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Actualizamos is_active = false
-    const query = `
-      UPDATE sections 
-      SET is_active = false, updated_at = CURRENT_TIMESTAMP 
-      WHERE id = $1 
-      RETURNING *;
+    // 1. Verificar si hay productos asociados a esta sección
+    const checkQuery = `
+      SELECT COUNT(*) FROM products WHERE section_id = $1;
     `;
-    const result = await db.query(query, [id]);
+    const checkResult = await db.query(checkQuery, [id]);
+    const productCount = parseInt(checkResult.rows[0].count, 10);
+
+    if (productCount > 0) {
+      return sendResponse(res, false, `No se puede eliminar la sección porque tiene ${productCount} producto(s) asociado(s)`, 400);
+    }
+
+    // 2. Si no hay productos, hacer hard delete
+    const deleteQuery = `
+      DELETE FROM sections WHERE id = $1 RETURNING *;
+    `;
+    const deleteResult = await db.query(deleteQuery, [id]);
     
-    if (result.rows.length === 0) {
-      return sendResponse(res, false, 'Sección no encontrada para desactivar', 404);
+    if (deleteResult.rows.length === 0) {
+      return sendResponse(res, false, 'Sección no encontrada para eliminar', 404);
     }
     
-    sendResponse(res, true, { message: 'Sección desactivada correctamente', section: mapSectionToClient(result.rows[0]) });
+    sendResponse(res, true, { message: 'Sección eliminada correctamente', section: mapSectionToClient(deleteResult.rows[0]) });
   } catch (err) {
     console.error('Error DELETE /api/sections/:id:', err);
-    sendResponse(res, false, 'Error al desactivar la sección', 500);
+    sendResponse(res, false, 'Error al eliminar la sección', 500);
   }
 });
 
