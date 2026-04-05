@@ -18,6 +18,8 @@ router.post('/', async (req, res) => {
             buyer_phone,
             buyer_email,
             delivery_method,
+            delivery_date = null,
+            delivery_time_range = null,
             shipping_fee = 0,
             shipping_cost_to_remis = 0,
             address_street = null,
@@ -50,16 +52,18 @@ router.post('/', async (req, res) => {
         const insertOrderText = `
             INSERT INTO orders (
                 order_number, buyer_name, buyer_phone, buyer_email, delivery_method, 
+                delivery_date, delivery_time_range,
                 shipping_fee, shipping_cost_to_remis, net_revenue_excluding_shipping, 
                 status, address_street, address_number, address_apartment, 
                 address_neighborhood, address_city, address_state, address_zip_code, 
                 address_references
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) 
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) 
             RETURNING *
         `;
 
         const insertOrderValues = [
             order_number, buyer_name, buyer_phone, buyer_email || '', delivery_method || 'pickup',
+            delivery_date, delivery_time_range,
             shipping_fee, shipping_cost_to_remis, net_revenue_excluding_shipping,
             initial_status, address_street, address_number, address_apartment,
             address_neighborhood, address_city, address_state, address_zip_code, address_references
