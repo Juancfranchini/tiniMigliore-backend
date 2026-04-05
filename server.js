@@ -6,6 +6,7 @@ const db = require('./db');
 const sectionsRouter = require('./routes/sections');
 const productsRouter = require('./routes/products');
 const settingsRouter = require('./routes/settings');
+const ordersRouter = require('./routes/orders');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -48,6 +49,7 @@ app.use(express.json());
 app.use('/api/sections', sectionsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/orders', ordersRouter);
 
 app.get('/', (req, res) => {
   res.send('Backend funcionando');
