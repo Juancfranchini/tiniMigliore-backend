@@ -16,7 +16,24 @@ const DEFAULT_SETTINGS = {
   'checkout.pickupEnabled': true,
   'checkout.deliveryEnabled': true,
   'notifications.senderName': 'Tini Migliore',
-  'notifications.supportEmail': ''
+  'notifications.supportEmail': '',
+  'landing.theme': 'dark',
+  'landing.heroTagline': 'Pastelería artesanal con alma',
+  'landing.aboutTitle': 'Hecha con amor,\npensada en vos',
+  'landing.aboutText1': 'Soy Tini, chef pastelera profesional. Cada torta, cada caja, cada alfajor que sale de mi cocina lleva tiempo, técnica y mucho cariño. No hago pastelería en serie — hago piezas únicas para momentos únicos.',
+  'landing.aboutText2': 'Trabajo con ingredientes de primera calidad y elaboración artesanal. Desde una merienda especial hasta el postre de tu evento más importante, me encargo de que cada bocado sea una experiencia.',
+  'landing.deliveryZone': 'CABA y GBA. Coordinamos día y horario por WhatsApp.',
+  'landing.pickupZone': 'Sin costo adicional. Zona Palermo / Villa del Parque.',
+  'landing.ctaTitle': '¿Te dio hambre?',
+  'landing.ctaSubtitle': 'Explorá el catálogo completo y armá tu pedido.',
+  'landing.specialty1Title': 'Tortas de diseño',
+  'landing.specialty1Desc': 'Para cumpleaños, casamientos y celebraciones. Personalizadas a tu gusto.',
+  'landing.specialty2Title': 'Bombones & tabletas',
+  'landing.specialty2Desc': 'Chocolate de primera selección, rellenos artesanales únicos.',
+  'landing.specialty3Title': 'Cajas de degustación',
+  'landing.specialty3Desc': 'Alfajores, sablés y petit fours. Perfectas para regalar o compartir.',
+  'landing.specialty4Title': 'Tartas & tarteletas',
+  'landing.specialty4Desc': 'Masa casera, rellenos de temporada. Lemon curd, frangipane, dulce de leche.',
 };
 
 // Inicializar configuraciones por defecto si no existen
